@@ -13,7 +13,9 @@ class ParticipantsController extends Controller
         try {
             $participant = Participant::with([
                 'member',
-                'member.address'
+                'member.address',
+                'member.orgInfo',
+                'member.orgInfo.orgChart'
             ])->where(['uniquecode' => $id])->first();
             if ($participant) {
                 return response()->json([

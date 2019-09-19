@@ -15,11 +15,11 @@ class CreateEventsTable extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('status_id')->nullable();
             $table->uuid('uniquecode')->unique();
             $table->date('eventdate')->index();
             $table->string('name', 150);
             $table->text('description')->nullable();
-            $table->string('status', 20)->default('Active');
             $table->boolean('pdpanric', 1)->default(0);
 			$table->boolean('pdpaaddress', 1)->default(0);
 			$table->boolean('pdpatelmobileemail', 1)->default(0);

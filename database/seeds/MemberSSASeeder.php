@@ -24,8 +24,9 @@ class MemberSSASeeder extends Seeder
             $gender = $faker->randomElement(['M', 'F']);
             $member = MemberSSA::create([
                 'uniquecode' => $faker->uuid,
-                'name' => $faker->name(($gender === 'M' ? ['YM','MD'] : ['YW','WD'])),
+                'name' => $faker->name(($gender === 'M' ? 'male' : 'female')),
                 'chinese_name' => $chinese->name($gender === 'M' ? 'male' : 'female'),
+                'gender' => $gender,
                 'birth_date' => $faker->dateTimeBetween('-40 years', '-20 years'),
                 'nric' => Nric::generateFakeNric()->current(),
                 'tel' => $faker->phoneNumber,

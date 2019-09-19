@@ -14,6 +14,11 @@ class Participant extends Model
         return $this->belongsTo(MemberSSA::class);
     }
 
+    public function role()
+    {
+        return $this->belongsTo(EventRole::class);
+    }
+
     public function events()
     {
         return $this->belongsToMany(Event::class, 'event_participants');

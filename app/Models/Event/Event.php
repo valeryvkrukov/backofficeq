@@ -24,6 +24,16 @@ class Event extends Model
         return $this->belongsToMany(EventType::class, 'events_event_types');
     }
 
+    public function eventLang()
+    {
+        return $this->belongsToMany(EventLanguage::class, 'events_event_languages');
+    }
+
+    public function eventStatus()
+    {
+        return $this->belongsTo(EventStatus::class, 'status_id');
+    }
+
     public function participants()
     {
         return $this->belongsToMany(Participant::class, 'event_participants');

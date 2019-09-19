@@ -2,6 +2,9 @@
 
 use App\Helpers\Nric;
 use App\Models\Event\Event;
+use App\Models\Event\EventLanguage;
+use App\Models\Event\EventRole;
+use App\Models\Event\EventStatus;
 use App\Models\Event\EventType;
 use App\Models\Event\MemberSSA;
 use App\Models\Event\Participant;
@@ -19,8 +22,47 @@ class EventTableSeeder extends Seeder
     {
         $eventTypeNames = ['Culture', 'Meeting', 'Study'];
         $eventTypes = [];
-        $participantStatus = [];
-        $members = [];
+        $eventRoles = [];
+        $eventRolesList = [
+            ['value' => 'Performer', 'abbv' => 'PFR'],
+            ['value' => 'Trainer', 'abbv' => 'DISP'],
+            ['value' => 'Chief Trainer', 'abbv' => 'DISP'],
+            ['value' => 'Assistant Chief Trainer', 'abbv' => 'DISP'],
+            ['value' => 'Cheorographer', 'abbv' => 'DISP'],
+            ['value' => 'Assistant Cheorographer', 'abbv' => 'DISP'],
+            ['value' => 'Display IC', 'abbv' => 'DISP'],
+            ['value' => 'Admin', 'abbv' => 'ADM'],
+            ['value' => 'Admin IC', 'abbv' => 'ADM'],
+            ['value' => 'Staff Support', 'abbv' => 'ADM'],
+            ['value' => 'Logistic', 'abbv' => 'LOG'],
+            ['value' => 'Logistics IC', 'abbv' => 'LOG'],
+            ['value' => 'Chairperson', 'abbv' => 'CCM'],
+            ['value' => 'Assistant Chairperson', 'abbv' => 'CCM'],
+            ['value' => 'Security'],
+            ['value' => 'Security IC'],
+            ['value' => 'Medical', 'abbv' => 'MED'],
+            ['value' => 'Medical IC', 'abbv' => 'MED'],
+            ['value' => 'Hospitality', 'abbv' => 'HOS'],
+            ['value' => 'Hospitality IC', 'abbv' => 'HOS'],
+            ['value' => 'Others'],
+            ['value' => 'Participant'],
+        ];
+        $languages = [];
+        $statuses = [];
+
+        foreach (['en' => 'English', 'zh' => 'Chinese'] as $code => $lang) {
+            $languages[] = EventLanguage::create([
+                'code' => $code,
+                'value' => $lang,
+            ]);
+        }
+
+        foreach (['Processing', 'Accepted', 'Rejected', 'Reserved', 'Pending', 'Withdrawn'] as $status) {
+            $statuses[] = EventStatus::create([
+                'code' => strtolower($status),
+                'value' => $status
+            ]);
+        }
 
         foreach ($eventTypeNames as $type) {
             $eventTypes[] = EventType::create([
@@ -29,8 +71,19 @@ class EventTableSeeder extends Seeder
             ]);
         }
 
+        foreach ($eventRolesList as $code => $role) {
+            $eventRoles[] = EventRole::create([
+                'code' => str_replace(' ', '-', strtolower($role['value'])),
+                'value' => $role['value'],
+                'abbv' => isset($role['abbv']) ? $role['abbv'] : null,
+            ]);
+        }
+
         $faker = Faker\Factory::create();
+        $languages = collect($languages);
+        $statuses = collect($statuses);
         $types = collect($eventTypes);
+        $eventRoles = collect($eventRoles);
         $members = MemberSSA::all();
 
         foreach ($members as $member) {
@@ -40,7 +93,6 @@ class EventTableSeeder extends Seeder
                 'eventdate' => $date,
                 'name' => $faker->catchPhrase,
                 'description' => $faker->realText(100),
-                'status' => strtotime($date->format('c')) < strtotime('today') ? 'Closed' : $faker->randomElement(['Active', 'Void']),
                 'pdpanric' => $faker->boolean(50),
                 'pdpatelmobileemail' => $faker->boolean(50),
                 'pdpaaddress' => $faker->boolean(50),
@@ -57,8 +109,11 @@ class EventTableSeeder extends Seeder
                 $participant = $_member->participant()->create([
                     'uniquecode' => $faker->uuid,
                 ]);
+                $eventRoles->random()->save([$participant->id]);
                 $participants[] = $participant->id;
             }
+            $statuses->random()->save([$event->id]);
+            $event->eventLang()->attach($languages->random()->id);
             $event->eventType()->attach($types->random()->id);
             $event->participants()->sync($participants);
         }
