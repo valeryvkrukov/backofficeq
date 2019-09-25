@@ -39,11 +39,14 @@ class EventsController extends Controller
     public function participants(Request $request, $id)
     {
         try {
-            $participants = Event_m_Registration::with('member')
-                ->where('eventid', $id)
-                ->get();
+            $event = Event_m_Event::with([
+                'registrations',
+                'registrations.member'
+            ])
+                ->where('uniquecode', $id)
+                ->first();
             return response()->json([
-                'participants' => $participants
+                'participants' => $event->registrations
             ], 200);
         } catch (Exception $e) {
             return response()->json([
