@@ -1,5 +1,5 @@
 <template>
-    <q-page padding>
+    <q-page v-if="this.loading === false" padding>
         <div class="q-pa-md q-gutter-sm">
             <q-splitter v-model="splitterModel">
                 <template v-slot:before>
@@ -102,6 +102,7 @@
                         animated
                         transition-prev="jump-up"
                         transition-next="jump-up"
+                        @before-transition="loadPanel"
                     >
                         <q-tab-panel name="pdpa">
                             <q-card class="relative-position row">
@@ -284,6 +285,11 @@
                 </template>
             </q-splitter>
         </div>
+        <q-page-sticky position="bottom-right" :offset="[18, 18]">
+            <q-btn v-if="allowed('create') && isEditMode === false" fab color="primary" :disable="loading" icon="mdi-pencil" @click="editParticipant" class="q-mr-sm"/>
+            <q-btn v-if="allowed('create') && isEditMode === true" fab color="red" :disable="loading" icon="mdi-check" @click="saveParticipant" class="q-mr-sm"/>
+            <q-btn v-if="allowed('create') && isEditMode === true" fab color="grey" :disable="loading" icon="mdi-cancel" @click="cancelEdit" class="q-mr-sm"/>
+        </q-page-sticky>
     </q-page>
 </template>
 
@@ -294,19 +300,17 @@ export default {
   name: 'Participant',
   data () {
     return {
+      loading: true,
       splitterModel: 20,
       tab: 'info',
       participant: {},
-      member: {}
+      member: {},
+      isEditMode: false
     }
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.loadParticipant(to.params).then((resp) => {
-        vm.participant = resp.participant
-        vm.member = resp.member
-        vm.loading = false
-      })
+      vm.loadPanel('info', '')
     })
   },
   computed: {
@@ -316,7 +320,17 @@ export default {
   },
   methods: {
     ...mapActions(['loadParticipant']),
-    ...mapGetters(['currentMember', 'userCan'])
+    ...mapGetters(['currentMember', 'userCan']),
+    loadPanel (next, prev) {
+      this.loadParticipant(this.$route.params).then((resp) => {
+        this.participant = resp.participant
+        this.member = resp.member
+        this.loading = false
+      })
+    },
+    editParticipant () {},
+    saveParticipant () {},
+    cancelEdit () {}
   }
 }
 </script>

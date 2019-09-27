@@ -1,5 +1,5 @@
 <template>
-    <q-page padding>
+    <q-page v-if="this.loading === false" padding>
         <div class="q-pa-md q-gutter-sm">
             <q-banner dense inline-actions class="shadow-1">
                 <template v-slot:avatar>
@@ -197,7 +197,7 @@ export default {
   name: 'EventEdit',
   data () {
     return {
-      loading: false,
+      loading: true,
       tab: 'info',
       tempData: {},
       eventTypes: [],
@@ -224,7 +224,6 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.loading = true
       vm.loadPanel('info', '')
     })
   },
@@ -244,16 +243,16 @@ export default {
       switch (next) {
         case 'participants':
           this.loadParticipants(this.$route.params).then((response) => {
-            this.loading = false
             this.participants = response.participants
+            this.loading = false
           }).catch((err) => console.log(err))
           break
         case 'info':
         default:
           this.loadEvent(this.$route.params).then((response) => {
-            this.loading = false
             this.event = this.tempData = JSON.parse(JSON.stringify(response.event))
             this.eventTypes = JSON.parse(JSON.stringify(response.eventTypes))
+            this.loading = false
           }).catch((err) => console.log(err))
       }
     },

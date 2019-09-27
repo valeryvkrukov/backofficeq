@@ -8,6 +8,7 @@ use App\Models\Event_m_Registration;
 use App\Models\EventzEventType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use function foo\func;
 
 class EventsController extends Controller
 {
@@ -58,17 +59,20 @@ class EventsController extends Controller
     public function details(Request $request, $id)
     {
         try {
+            $this->checkResourceAccess(['EV07']);
             $event = Event_m_Event::where('uniquecode', $id)->first();
             $eventTypes = EventzEventType::all();
+
             return response()->json([
                 'event' => $event,
                 'event_types' => $eventTypes,
-                'participants' => []
+                'participants' => [],
+                'has_access' => $this->checkResourceAccess(),
             ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'error' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode());
         }
     }
 }

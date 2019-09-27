@@ -1,5 +1,5 @@
 <template>
-    <q-page padding>
+    <q-page v-if="this.loading === false" padding>
         <div class="q-pa-md q-gutter-sm">
             <q-table
                 :data="eventsList()"

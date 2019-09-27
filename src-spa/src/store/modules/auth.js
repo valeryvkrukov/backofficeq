@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Cookies } from 'quasar'
+import Router from '../../router'
 
 const state = {
   status: '',
@@ -117,6 +118,9 @@ const actions = {
       commit('UPDATE_ACCESS_TOKEN')
       resolve()
     })
+  },
+  forbidden ({ commit }) {
+    commit('AUTH_ACCESS_DENIED')
   }
 }
 
@@ -145,6 +149,7 @@ const mutations = {
     Cookies.remove('r')
     Cookies.remove('p')
     delete axios.defaults.headers.common['Authorization']
+    Router.replace('/login')
   },
   AUTH_RESET_PASS_REQUEST (state) {
     state.status = 'loading'
@@ -158,6 +163,9 @@ const mutations = {
   },
   UPDATE_ACCESS_TOKEN (state, token) {
     state.token = Cookies.get('token')
+  },
+  AUTH_ACCESS_DENIED (state) {
+    Router.replace('/')
   }
 }
 

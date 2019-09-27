@@ -32,7 +32,6 @@ const mutations = {
     state.status = 'success'
     state.events = data.records.map((item) => ({
       ...item,
-      // event_type: item.event_type[0].value || 'not set',
       rowSelected: 'false'
     }))
   },
